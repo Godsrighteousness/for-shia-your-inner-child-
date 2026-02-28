@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A Safe Place For Mrs. Sujal</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* Variables */
+        :root {
+            --bg-dark: #07090f; 
+            --bg-gradient: linear-gradient(135deg, #05070a 0%, #111424 100%);
+            --text-main: #f2f2f2;
+            --text-muted: #b3b6c2;
+            --accent-glow: #e2a8b9; 
+            --accent-glow-dim: rgba(226, 168, 185, 0.15);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.05);
+            --font-head: 'Playfair Display', serif;
+            --font-body: 'Poppins', sans-serif;
+        }
+
+        /* Reset */
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-gradient); background-attachment: fixed;
+            color: var(--text-main); font-family: var(--font-body);
+            line-height: 1.8; overflow-x: hidden; min-height: 100vh;
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            font-family: var(--font-head); font-weight: 400;
+            color: var(--accent-glow); margin-bottom: 25px; letter-spacing: 0.5px;
+        }
+        h2 { font-size: 1.7rem; }
+        p { font-size: 1.05rem; font-weight: 300; margin-bottom: 20px; }
+        .signature { font-family: var(--font-head); font-size: 1.5rem; color: var(--accent-glow); margin-top: 40px; }
+        .highlight { color: var(--accent-glow); font-style: italic; }
+
+        /* Opening Screen */
+        #intro-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--bg-dark); z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 2s ease, visibility 2s ease; padding: 20px; text-align: center;
+        }
+        .typing-text { font-family: var(--font-head); font-size: 1.6rem; color: var(--accent-glow); min-height: 100px; line-height: 1.5; }
+        .cursor { display: inline-block; width: 2px; height: 1.2em; background-color: var(--accent-glow); vertical-align: middle; animation: blink 1s infinite; }
+        .intro-subtext { font-family: var(--font-body); color: var(--text-muted); margin-top: 20px; opacity: 0; transition: opacity 1.5s ease; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* Buttons */
+        .btn {
+            background: transparent; color: var(--text-main);
+            border: 1px solid var(--card-border); padding: 12px 35px;
+            border-radius: 30px; font-family: var(--font-body); font-size: 1rem;
+            cursor: pointer; transition: all 0.5s ease; backdrop-filter: blur(5px);
+            margin-top: 15px;
+        }
+        .btn:hover { color: var(--accent-glow); border-color: var(--accent-glow); box-shadow: 0 0 15px var(--accent-glow-dim); }
+        #enter-btn { margin-top: 40px; opacity: 0; transform: translateY(10px); }
+
+        /* Main Content & Cards */
+        #main-content { display: none; opacity: 0; transition: opacity 2s ease; max-width: 650px; margin: 0 auto; padding: 80px 25px 120px 25px; }
+        .card {
+            background: var(--card-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--card-border); border-radius: 20px; padding: 45px 35px; margin-bottom: 50px;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; overflow: hidden;
+        }
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-glow-dim), transparent);
+        }
+        .fade-up { opacity: 0; transform: translateY(30px); transition: opacity 1.5s ease, transform 1.5s ease; }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+        /* Heartbeat Toggle */
+        .heartbeat-container { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+        .heartbeat-btn {
+            background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-muted);
+            padding: 8px 20px; border-radius: 30px; font-size: 0.85rem; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.5s ease;
+        }
+        .heartbeat-btn.active { color: var(--accent-glow); border-color: var(--accent-glow); animation: softPulse 2s infinite; }
+        @keyframes softPulse { 0% { box-shadow: 0 0 0 0 var(--accent-glow-dim); } 50% { box-shadow: 0 0 0 10px rgba(226, 168, 185, 0); } 100% { box-shadow: 0 0 0 0 rgba(226, 168, 185, 0); } }
+
+        /* Interactive Sections (Hold Button) */
+        .interactive-box { margin-top: 30px; display: flex; flex-direction: column; align-items: center; }
+        .instruction { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px; }
+        .hold-btn {
+            width: 120px; height: 120px; border-radius: 50%; background: transparent; border: 1px solid var(--accent-glow);
+            color: var(--accent-glow); font-family: var(--font-body); font-size: 1.1rem; cursor: pointer;
+            box-shadow: 0 0 20px var(--accent-glow-dim); transition: all 0.8s ease; outline: none;
+            -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+        }
+        .hold-btn.pressing { transform: scale(0.85); background: var(--accent-glow-dim); box-shadow: 0 0 40px var(--accent-glow); }
+
+        /* General Overlay Style for Modals */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(5, 7, 10, 0.95); z-index: 10000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; transition: opacity 0.8s ease, visibility 0.8s ease;
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 30px; text-align: center;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-text { font-family: var(--font-head); font-size: 1.8rem; color: var(--accent-glow); margin-bottom: 40px; line-height: 1.5; }
+        
+        /* Breathe Overlay specifics */
+        .breathe-circle {
+            position: absolute; width: 200px; height: 200px; border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-glow-dim) 0%, transparent 70%);
+            animation: breatheAnim 8s infinite ease-in-out; pointer-events: none;
+        }
+        @keyframes breatheAnim { 0%, 100% { transform: scale(1); opacity: 0.2; } 50% { transform: scale(2.5); opacity: 0.5; } }
+        #calming-text { opacity: 0; transition: opacity 1.5s ease; z-index: 2; }
+        #calming-text.show { opacity: 1; }
+
+        @media (max-width: 480px) {
+            h2 { font-size: 1.5rem; }
+            p { font-size: 1rem; }
+            .card { padding: 35px 20px; }
+            .typing-text { font-size: 1.4rem; }
+            .modal-text { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-heartbeat" src="heartbeat.mp3" loop></audio>
+    <audio id="audio-unloved" src="voice_unloved.mp3"></audio>
+    <audio id="audio-miss" src="voice_miss.mp3"></audio>
+
+    <div id="intro-screen">
+        <div class="typing-text"><span id="typed-text"></span><span class="cursor"></span></div>
+        <p class="intro-subtext" id="sub-text">Come slowly… no rush.</p>
+        <button id="enter-btn" class="btn">Enter 🤍</button>
+    </div>
+
+    <div class="heartbeat-container">
+        <button id="heartbeat-toggle" class="heartbeat-btn">Heartbeat 🤍</button>
+    </div>
+
+    <div id="audio-overlay" class="modal-overlay">
+        <div class="modal-text" id="audio-overlay-text"></div>
+    </div>
+
+    <div id="breathe-overlay" class="modal-overlay">
+        <div class="breathe-circle"></div>
+        <div class="modal-text" id="calming-text">Hey… breathe slowly.</div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; z-index: 2; margin-bottom: 20px;">Know I am here… breathe.</p>
+        <button class="btn" style="z-index: 2;" id="close-breathe">I’m okay</button>
+    </div>
+
+    <div id="past-overlay" class="modal-overlay">
+        <div class="modal-text" id="past-text"></div>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+            <button class="btn" onclick="showNextPastText()">Read Another 🤍</button>
+            <button class="btn" onclick="closeModal('past-overlay')">Close</button>
+        </div>
+    </div>
+
+    <div id="missing-overlay" class="modal-overlay">
+        <div class="modal-text" id="missing-text"></div>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+            <button class="btn" onclick="showRandomMissingText()">Miss me more? ✨</button>
+            <button class="btn" onclick="closeModal('missing-overlay')">Close</button>
+        </div>
+    </div>
+
+    <div id="main-content">
+        
+        <section class="card fade-up">
+            <p>Akriti… my beautiful <span class="highlight">Mrs. Sujal.</span></p>
+            <p>I didn’t just build a webpage. I wanted to build a sanctuary for your mind.</p>
+            <p>A place where the noise of the world stops, where expectations disappear, and where you can just exist.</p>
+            <p>Whenever your heart feels heavy, whenever you doubt yourself, come here. You don’t have to put on a brave face for me. Just be exactly who you are.</p>
+        </section>
+
+        <section class="card fade-up">
+            <h2>For The Shadows Of Your Past</h2>
+            <p>I know there are days when the memories of being bullied, being misunderstood, and being falsely blamed try to tell you that you are weak.</p>
+            <p>They lied to you, Akriti. You are the strongest person I know.</p>
+            <p>Whenever those old fears creep in, tap below. Let me remind you of the truth.</p>
+            <button class="btn" onclick="openPastModal()">Heal My Fears 🤍</button>
+        </section>
+
+        <section class="card fade-up">
+            <h2>I Am Your Shield</h2>
+            <p>You spent so much of your life having to defend your character. You had to explain yourself to people who didn't want to listen.</p>
+            <p>With me, the fighting is over.</p>
+            <p>I trust your pure heart completely. Even when things get hard, or when we are scared, I am not standing against you. I am standing directly in front of you, protecting you.</p>
+        </section>
+
+        <section class="card fade-up">
+            <h2>When You Miss Me</h2>
+            <p>Distance is just physical, my love. My mind is always wrapped around yours.</p>
+            <p>If you ever miss me, or just want to know what I'm thinking about you, tap here. I left some messages for you to find.</p>
+            <button class="btn" onclick="openMissingModal()">I miss you, Sujal ✨</button>
+        </section>
+
+        <section class="card fade-up">
+            <h2>For Shia… 🌙</h2>
+            <p>Hey little Shia…</p>
+            <p>I know the world was too harsh on you when you were small. I know you had to grow up faster than you should have, and hold back tears so no one would see.</p>
+            <p>You can let go now. I’ve got you. I will protect you from the things that used to scare you. You are so loved, and you never have to be strong alone again.</p>
+        </section>
+
+        <section class="card fade-up">
+            <div class="interactive-box">
+                <p class="instruction" style="font-size: 1.1rem; color: var(--accent-glow);">When the panic sets in, or you feel like you aren't enough...<br>press and hold this 🤍</p>
+                <button class="hold-btn" id="hold-btn" oncontextmenu="return false;">Hold me</button>
+            </div>
+        </section>
+
+        <section class="card fade-up">
+            <h2>When you feel unloved…</h2>
+            <p>Sometimes your mind will lie to you and tell you that you are hard to love. When that happens, close your eyes and listen to my voice.</p>
+            <button class="btn" onclick="toggleVoice('audio-unloved', 'I’m right here… just listen. You are so easy to love.', this)">Play 🤍</button>
+        </section>
+
+        <section class="card fade-up">
+            <h2>When you need me near…</h2>
+            <p>For the late nights of studying when the room feels too quiet.</p>
+            <button class="btn" onclick="toggleVoice('audio-miss', 'Close your eyes, Mrs. Sujal… I’m holding your hand.', this)">Play 🤍</button>
+        </section>
+
+        <section class="card fade-up">
+            <h2>Even On Our Worst Days</h2>
+            <p>Even when we fight, even when we are both angry and the words get messy...</p>
+            <p>Please remember this: I am never going to leave. It will always be You and Me versus the problem.</p>
+            <p>My love for you doesn't pause when we argue. I am forever on your side.</p>
+        </section>
+
+        <section class="card fade-up" style="background: transparent; border: none; box-shadow: none;">
+            <p>I feel so incredibly blessed to be yours.</p>
+            <p>You never have to fight the darkness alone anymore.</p>
+            <p>You have a home. You have me.</p>
+            <p class="signature">— Yours forever, Sujal ❤️</p>
+        </section>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // --- TYPING ANIMATION ---
+            const lines = ["Hey…", "this is a safe place…", "just for you, Mrs. Sujal ❤️"];
+            const typedTextElement = document.getElementById("typed-text");
+            const subText = document.getElementById("sub-text");
+            const enterBtn = document.getElementById("enter-btn");
+            
+            let lineIndex = 0; let charIndex = 0;
+
+            function typeWriter() {
+                if (lineIndex < lines.length) {
+                    if (charIndex < lines[lineIndex].length) {
+                        typedTextElement.innerHTML += lines[lineIndex].charAt(charIndex);
+                        charIndex++;
+                        setTimeout(typeWriter, 80);
+                    } else {
+                        typedTextElement.innerHTML += "<br>";
+                        lineIndex++; charIndex = 0;
+                        setTimeout(typeWriter, 600);
+                    }
+                } else {
+                    setTimeout(() => {
+                        subText.style.opacity = "1";
+                        setTimeout(() => {
+                            enterBtn.style.opacity = "1";
+                            enterBtn.style.transform = "translateY(0)";
+                        }, 1000);
+                    }, 500);
+                }
+            }
+            setTimeout(typeWriter, 1000);
+
+            // --- ENTER BUTTON LOGIC ---
+            const introScreen = document.getElementById("intro-screen");
+            const mainContent = document.getElementById("main-content");
+            const bgHeartbeat = document.getElementById("bg-heartbeat");
+            const heartbeatToggle = document.getElementById("heartbeat-toggle");
+            bgHeartbeat.volume = 0.15;
+
+            enterBtn.addEventListener("click", () => {
+                introScreen.style.opacity = "0";
+                setTimeout(() => {
+                    introScreen.style.display = "none";
+                    mainContent.style.display = "block";
+                    void mainContent.offsetWidth; 
+                    mainContent.style.opacity = "1";
+                    initScrollObserver();
+                }, 2000);
+            });
+
+            // --- HEARTBEAT TOGGLE ---
+            let isHeartbeatPlaying = false;
+            heartbeatToggle.addEventListener("click", () => {
+                if(isHeartbeatPlaying) {
+                    bgHeartbeat.pause(); heartbeatToggle.classList.remove("active"); isHeartbeatPlaying = false;
+                } else {
+                    bgHeartbeat.play().catch(e => console.log("Audio error", e));
+                    heartbeatToggle.classList.add("active"); isHeartbeatPlaying = true;
+                }
+            });
+
+            // --- SCROLL REVEAL ---
+            function initScrollObserver() {
+                const fadeElements = document.querySelectorAll('.fade-up');
+                const observer = new IntersectionObserver((entries, obs) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) { entry.target.classList.add('visible'); obs.unobserve(entry.target); }
+                    });
+                }, { threshold: 0.15 });
+                fadeElements.forEach(el => observer.observe(el));
+            }
+
+            // --- HOLD TO BREATHE LOGIC ---
+            const holdBtn = document.getElementById("hold-btn");
+            const breatheOverlay = document.getElementById("breathe-overlay");
+            const closeBreatheBtn = document.getElementById("close-breathe");
+            const calmingTextEl = document.getElementById("calming-text");
+            
+            let holdTimer; let textInterval;
+            const breatheMsgs = [
+                "Hey… breathe slowly.", 
+                "I’m right here beside you.", 
+                "You are perfectly safe.", 
+                "I am so incredibly proud of you.", 
+                "You are my entire world.",
+                "I love you exactly as you are.",
+                "Rest your mind, my love.",
+                "I trust you."
+            ];
+
+            function startBreatheSession() {
+                breatheOverlay.classList.add("active");
+                calmingTextEl.classList.add("show");
+                let mIndex = 0;
+                textInterval = setInterval(() => {
+                    calmingTextEl.classList.remove("show");
+                    setTimeout(() => {
+                        mIndex = (mIndex + 1) % breatheMsgs.length;
+                        calmingTextEl.textContent = breatheMsgs[mIndex];
+                        calmingTextEl.classList.add("show");
+                    }, 1000);
+                }, 4000);
+            }
+
+            function startHold(e) {
+                if(e.type === 'touchstart') e.preventDefault();
+                holdBtn.classList.add("pressing");
+                holdTimer = setTimeout(() => { cancelHold(); startBreatheSession(); }, 800);
+            }
+
+            function cancelHold() { holdBtn.classList.remove("pressing"); clearTimeout(holdTimer); }
+
+            holdBtn.addEventListener("mousedown", startHold); holdBtn.addEventListener("mouseup", cancelHold);
+            holdBtn.addEventListener("mouseleave", cancelHold); holdBtn.addEventListener("touchstart", startHold, {passive: false});
+            holdBtn.addEventListener("touchend", cancelHold); holdBtn.addEventListener("touchcancel", cancelHold);
+
+            closeBreatheBtn.addEventListener("click", () => {
+                breatheOverlay.classList.remove("active"); clearInterval(textInterval);
+                setTimeout(() => { calmingTextEl.textContent = breatheMsgs[0]; }, 1000);
+            });
+
+        });
+
+        // --- GLOBAL MODAL LOGIC ---
+        function closeModal(modalId) { document.getElementById(modalId).classList.remove("active"); }
+
+        // --- PAST FEARS LOGIC ---
+        const pastLines = [
+            "The people who blamed you were wrong. You have a beautiful, pure heart.",
+            "You survived their cruelty, and it didn't turn you cold. That is your superpower.",
+            "I am standing between you and everyone who ever misunderstood you. You are safe behind me.",
+            "The blame was never yours to carry. Drop it here, with me.",
+            "You never have to prove your goodness to me. I see it every single day.",
+            "You are not weak. Surviving all of that makes you the strongest girl I know."
+        ];
+        let pastIndex = -1;
+        function openPastModal() { showNextPastText(); document.getElementById('past-overlay').classList.add("active"); }
+        function showNextPastText() {
+            pastIndex = (pastIndex + 1) % pastLines.length;
+            const textEl = document.getElementById('past-text');
+            textEl.style.opacity = 0;
+            setTimeout(() => { textEl.textContent = pastLines[pastIndex]; textEl.style.opacity = 1; }, 300);
+        }
+
+        // --- MISSING YOU LOGIC ---
+        const missingLines = [
+            "I was just thinking about your smile. It's my favorite thing in the world.",
+            "Even when we are apart, my heart is sitting right next to yours.",
+            "I am so incredibly lucky that you are mine, Mrs. Sujal.",
+            "Close your eyes. Imagine me kissing your forehead right now.",
+            "You are the absolute best thing that has ever happened to me.",
+            "I would choose you in every lifetime, in every universe.",
+            "Just a reminder: You are deeply, completely, and unconditionally loved.",
+            "I can't wait to hold you again."
+        ];
+        function openMissingModal() { showRandomMissingText(); document.getElementById('missing-overlay').classList.add("active"); }
+        function showRandomMissingText() {
+            const randomIndex = Math.floor(Math.random() * missingLines.length);
+            const textEl = document.getElementById('missing-text');
+            textEl.style.opacity = 0;
+            setTimeout(() => { textEl.textContent = missingLines[randomIndex]; textEl.style.opacity = 1; }, 300);
+        }
+
+        // --- VOICE LOGIC ---
+        let currentAudio = null; let currentBtn = null;
+        const audioOverlay = document.getElementById("audio-overlay");
+        const audioOverlayText = document.getElementById("audio-overlay-text");
+
+        function toggleVoice(audioId, text, btnElement) {
+            const audio = document.getElementById(audioId);
+            if(currentAudio === audio && !audio.paused) { audio.pause(); resetAudioUI(); return; }
+            if(currentAudio && !currentAudio.paused) { currentAudio.pause(); currentAudio.currentTime = 0; if(currentBtn) currentBtn.innerHTML = "Play 🤍"; }
+
+            currentAudio = audio; currentBtn = btnElement;
+            audio.play().then(() => {
+                btnElement.innerHTML = "Pause 🤍"; audioOverlayText.textContent = text; audioOverlay.classList.add("active");
+            }).catch(e => { alert("Please ensure your voice note is uploaded correctly!"); });
+
+            audio.onended = () => { resetAudioUI(); };
+        }
+
+        function resetAudioUI() { audioOverlay.classList.remove("active"); if(currentBtn) currentBtn.innerHTML = "Play 🤍"; currentAudio = null; currentBtn = null; }
+        audioOverlay.addEventListener("click", () => { if(currentAudio && !currentAudio.paused) { currentAudio.pause(); resetAudioUI(); } });
+
+    </script>
+</body>
+</html>
